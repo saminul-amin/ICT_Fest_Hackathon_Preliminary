@@ -1,8 +1,8 @@
-"""In-memory response caches for read-heavy reporting endpoints.
+"""Consistency-first cache hooks for reporting endpoints.
 
-Usage reports and per-room availability are relatively expensive to compute and
-are read far more often than the underlying data changes, so results are cached
-and invalidated when the data they depend on is modified.
+The hackathon contract requires reports and availability to reflect the current
+database state immediately. These helpers intentionally behave as no-ops so the
+routes can keep a small abstraction without serving stale API responses.
 """
 
 _report_cache: dict[tuple, dict] = {}
@@ -10,11 +10,11 @@ _availability_cache: dict[tuple, dict] = {}
 
 
 def get_report(org_id: int, frm: str, to: str):
-    return _report_cache.get((org_id, frm, to))
+    return None
 
 
 def set_report(org_id: int, frm: str, to: str, value: dict) -> None:
-    _report_cache[(org_id, frm, to)] = value
+    return None
 
 
 def invalidate_report(org_id: int) -> None:
@@ -23,11 +23,11 @@ def invalidate_report(org_id: int) -> None:
 
 
 def get_availability(room_id: int, date: str):
-    return _availability_cache.get((room_id, date))
+    return None
 
 
 def set_availability(room_id: int, date: str, value: dict) -> None:
-    _availability_cache[(room_id, date)] = value
+    return None
 
 
 def invalidate_availability(room_id: int, date: str) -> None:

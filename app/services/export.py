@@ -4,6 +4,7 @@ import io
 
 from sqlalchemy.orm import Session
 
+from ..errors import AppError
 from ..models import Booking, Room
 from ..timeutils import iso_utc
 
@@ -17,16 +18,6 @@ EXPORT_HEADER = [
     "status",
     "price_cents",
 ]
-
-
-def fetch_bookings_raw(db: Session, room_id: int) -> list[Booking]:
-    """Load every booking for a single room, ordered by id."""
-    return (
-        db.query(Booking)
-        .filter(Booking.room_id == room_id)
-        .order_by(Booking.id.asc())
-        .all()
-    )
 
 
 def _fetch_scoped(db: Session, org_id: int, user_id: int | None, room_id: int | None) -> list[Booking]:
@@ -45,11 +36,13 @@ def generate_export(
     room_id: int | None,
     include_all: bool,
 ) -> str:
+    if room_id is not None:
+        room = db.query(Room).filter(Room.id == room_id, Room.org_id == org_id).first()
+        if room is None:
+            raise AppError(404, "ROOM_NOT_FOUND", "Room not found")
+
     if include_all:
-        if room_id is not None:
-            rows = fetch_bookings_raw(db, room_id)
-        else:
-            rows = _fetch_scoped(db, org_id, None, None)
+        rows = _fetch_scoped(db, org_id, None, room_id)
     else:
         rows = _fetch_scoped(db, org_id, user_id, room_id)
 
