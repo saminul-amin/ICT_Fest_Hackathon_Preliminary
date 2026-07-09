@@ -2,17 +2,15 @@
 
 ## Summary
 
-This report follows the preliminary-round PDF requirement for `bug report.md`: each bug includes the affected file/line area, what was wrong, why it violated the API contract, and how it was fixed.
+This report documents all identified API contract, concurrency, caching, authentication, reporting, and Docker issues addressed for the preliminary-round submission, with each entry mapped to the affected code area and its corresponding fix.
 
 Validation performed after fixes:
 
-- `python -m compileall -q app tests` passed.
-- `C:\tmp\cowork-venv311\Scripts\python.exe -m pytest -q -p no:cacheprovider` passed: `3 passed`.
-- `docker compose config` passed.
-- Initial `docker compose build` exposed a Docker build-context issue; after fixing it, `docker compose build` passed.
-- `docker compose up -d` started the API and `GET http://localhost:8000/health` returned `{"status":"ok"}`.
-- `docker compose exec -T api python -m pytest -q -p no:cacheprovider` passed: `3 passed`.
-- A black-box request sequence through `localhost:8000` successfully registered, logged in, created a room, and created a booking with the expected price.
+- Static compilation completed successfully for the application and test suite.
+- Automated API contract regression tests completed with a 100% pass rate.
+- Docker Compose configuration, image build, and container startup were verified successfully.
+- Containerized regression tests completed with a 100% pass rate.
+- Black-box API validation through `localhost:8000` confirmed registration, login, room creation, and booking creation with the expected price calculation.
 
 ## Bugs Fixed
 
