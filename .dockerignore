@@ -3,5 +3,7 @@ __pycache__/
 *.db
 .venv/
 venv/
+.pytest_cache/
 .git/
 PROJECT_SPEC.md
+ICT_Fest_Hackathon_Preliminary.pdf

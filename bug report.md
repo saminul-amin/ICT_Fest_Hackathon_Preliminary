@@ -8,7 +8,11 @@ Validation performed after fixes:
 
 - `python -m compileall -q app tests` passed.
 - `C:\tmp\cowork-venv311\Scripts\python.exe -m pytest -q -p no:cacheprovider` passed: `3 passed`.
-- Docker verification is pending because Docker was not available during this pass.
+- `docker compose config` passed.
+- Initial `docker compose build` exposed a Docker build-context issue; after fixing it, `docker compose build` passed.
+- `docker compose up -d` started the API and `GET http://localhost:8000/health` returned `{"status":"ok"}`.
+- `docker compose exec -T api python -m pytest -q -p no:cacheprovider` passed: `3 passed`.
+- A black-box request sequence through `localhost:8000` successfully registered, logged in, created a room, and created a booking with the expected price.
 
 ## Bugs Fixed
 
@@ -200,3 +204,10 @@ Validation performed after fixes:
 - Bug: the previous test only covered a happy path and missed contract-critical behavior.
 - Why incorrect: the most important black-box API bugs could pass local tests.
 - How fixed: the test suite now checks auth TTL/logout/refresh reuse, duplicate registration, booking validation, back-to-back bookings, conflict detection, pagination, booking detail, refunds, re-cancel behavior, stats, availability, and cross-org export scoping.
+
+### 28. Docker build context included local test/cache artifacts
+
+- Files/lines: `.dockerignore:1-9`
+- Bug: `.dockerignore` did not exclude `.pytest_cache/`, and Docker failed while sending the build context with `Access is denied` for the local `.pytest_cache` directory. The attached PDF was also included in the build context unnecessarily.
+- Why incorrect: the PDF requires the grader to build the submitted repository in Docker; local cache artifacts must not make the Docker build fail or bloat the image context.
+- How fixed: `.dockerignore` now excludes `.pytest_cache/` and `ICT_Fest_Hackathon_Preliminary.pdf`, after which `docker compose build` completed successfully.
